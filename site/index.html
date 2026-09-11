@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danish Siddiqui — Solutions Architect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0F1B2D;
+    --bg-panel: #14243A;
+    --line: #25384F;
+    --text: #EDEFF2;
+    --text-dim: #9FB0C3;
+    --accent: #5FA8E0;
+    --accent-warm: #C98A3E;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  a{ color:var(--accent); text-decoration:none; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 28px; }
+
+  /* NAV */
+  nav{ position:sticky; top:0; background:rgba(15,27,45,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); z-index:10; }
+  nav .wrap{ display:flex; justify-content:space-between; align-items:center; height:60px; }
+  nav .name{ font-weight:600; font-size:15px; }
+  nav .links{ display:flex; gap:24px; font-size:13px; }
+  nav .links a{ color:var(--text-dim); }
+  nav .links a:hover{ color:var(--text); }
+
+  /* HERO */
+  header.hero{ padding:100px 0 70px; border-bottom:1px solid var(--line); position:relative; overflow:hidden; }
+  .eyebrow{ color:var(--accent); font-size:13px; letter-spacing:0.02em; margin-bottom:18px; }
+  h1{ font-size:clamp(34px,5vw,54px); font-weight:600; line-height:1.12; max-width:11ch; }
+  .role{ color:var(--text-dim); font-size:19px; margin-top:16px; max-width:52ch; }
+  .hero-meta{ display:flex; gap:28px; margin-top:36px; font-size:13px; color:var(--text-dim); flex-wrap:wrap; }
+  .hero-meta span{ display:flex; align-items:center; gap:8px; }
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block; }
+
+  /* NETWORK DIAGRAM */
+  .diagram{ margin-top:56px; }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .node-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--text-dim); }
+  .node-label.active{ fill:var(--text); }
+
+  /* SECTIONS */
+  section{ padding:60px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  h2{ font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); font-family:'IBM Plex Mono',monospace; font-weight:500; margin-bottom:28px; }
+  .summary-text{ font-size:17px; max-width:68ch; color:#DCE2EA; }
+
+  /* SKILLS */
+  .skills-grid{ display:grid; grid-template-columns:1fr 1fr; gap:36px; }
+  .skill-cat h3{ font-size:14px; font-weight:600; margin-bottom:10px; }
+  .skill-cat ul{ list-style:none; }
+  .skill-cat li{ font-size:13.5px; color:var(--text-dim); padding:5px 0 5px 16px; position:relative; border-left:1px solid var(--line); margin-left:2px; }
+  .skill-cat li::before{ content:""; position:absolute; left:-3px; top:13px; width:5px; height:1px; background:var(--line); }
+
+  /* EXPERIENCE TIMELINE */
+  .role-entry{ display:grid; grid-template-columns:130px 1fr; gap:20px; padding:26px 0; border-top:1px solid var(--line); }
+  .role-entry:first-child{ border-top:none; }
+  .role-dates{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-dim); padding-top:3px; }
+  .role-title{ font-size:16px; font-weight:600; }
+  .role-org{ color:var(--accent); font-size:14px; margin-top:2px; }
+  .role-desc{ color:var(--text-dim); font-size:14px; margin-top:10px; max-width:60ch; }
+
+  /* PROJECT */
+  .project-card{ background:var(--bg-panel); border:1px solid var(--line); border-radius:6px; padding:26px; }
+  .project-card h3{ font-size:16px; margin-bottom:8px; }
+  .project-meta{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent-warm); margin-bottom:14px; }
+  .project-stats{ display:flex; gap:32px; margin-top:18px; }
+  .stat{ font-family:'IBM Plex Mono',monospace; }
+  .stat .num{ font-size:24px; color:var(--accent); font-weight:500; }
+  .stat .label{ font-size:11px; color:var(--text-dim); margin-top:2px; }
+
+  /* CONTACT */
+  footer{ padding:60px 0 80px; text-align:left; }
+  footer .cta{ font-size:22px; font-weight:600; max-width:20ch; }
+  footer .contact-links{ margin-top:24px; display:flex; gap:24px; font-family:'IBM Plex Mono',monospace; font-size:13px; }
+
+  @media (max-width:640px){
+    .skills-grid{ grid-template-columns:1fr; }
+    .role-entry{ grid-template-columns:1fr; gap:6px; }
+    nav .links{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="name mono">D. SIDDIQUI</span>
+    <div class="links">
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow mono">Solutions Architect / Infrastructure Engineering Lead</div>
+    <h1>Danish Siddiqui</h1>
+    <p class="role">17+ years designing and delivering cloud &amp; telecom infrastructure — from Comptel mediation platforms in Riyadh to AWS-native architecture in London.</p>
+    <div class="hero-meta">
+      <span><span class="dot"></span>London, UK</span>
+      <span><span class="dot"></span>AWS Solutions Architect Associate</span>
+      <span><span class="dot"></span>Available for select engagements</span>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 860 120" xmlns="http://www.w3.org/2000/svg">
+        <line x1="30" y1="60" x2="830" y2="60" stroke="#25384F" stroke-width="1"/>
+        <g>
+          <circle cx="60" cy="60" r="5" fill="#5FA8E0"/>
+          <text x="60" y="40" class="node-label" text-anchor="middle">2006</text>
+          <text x="60" y="90" class="node-label" text-anchor="middle">Linux Admin</text>
+        </g>
+        <g>
+          <circle cx="260" cy="60" r="5" fill="#5FA8E0"/>
+          <text x="260" y="40" class="node-label" text-anchor="middle">2010</text>
+          <text x="260" y="90" class="node-label" text-anchor="middle">Mediation Ops Lead</text>
+        </g>
+        <g>
+          <circle cx="440" cy="60" r="5" fill="#5FA8E0"/>
+          <text x="440" y="40" class="node-label" text-anchor="middle">2012</text>
+          <text x="440" y="90" class="node-label" text-anchor="middle">Solaris → RHEL</text>
+        </g>
+        <g>
+          <circle cx="640" cy="60" r="6.5" fill="#C98A3E"/>
+          <text x="640" y="40" class="node-label active" text-anchor="middle">2017</text>
+          <text x="640" y="90" class="node-label active" text-anchor="middle">CRUK — AWS Architecture</text>
+        </g>
+        <g>
+          <circle cx="810" cy="60" r="6.5" fill="#C98A3E">
+            <animate attributeName="r" values="6.5;9;6.5" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <text x="810" y="40" class="node-label active" text-anchor="middle">Now</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section id="summary">
+  <div class="wrap">
+    <h2>// Summary</h2>
+    <p class="summary-text">Infrastructure and cloud engineer with 17+ years across telecom, payments, and enterprise environments, including hands-on telecom mediation/billing operations in the KSA market. Track record of leading cross-team technical migrations — from legacy Solaris/Unix estates to modern Linux platforms, and from vendor-managed infrastructure to AWS-native architecture. Progressed internally at Cancer Research UK from Systems Administrator to Senior Infrastructure Engineer over an 8-year tenure.</p>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <h2>// Key Skills</h2>
+    <div class="skills-grid">
+      <div class="skill-cat">
+        <h3>Architecture &amp; Design</h3>
+        <ul>
+          <li>Solution design for AWS-based systems</li>
+          <li>Cloud migration &amp; modernisation</li>
+          <li>Multi-account AWS architecture (Landing Zone, Control Tower)</li>
+          <li>Serverless &amp; event-driven architecture</li>
+        </ul>
+      </div>
+      <div class="skill-cat">
+        <h3>AWS &amp; Cloud</h3>
+        <ul>
+          <li>IAM, VPC, EC2, S3, Lambda, DynamoDB, Route 53, WAF</li>
+          <li>AWS CDK (TypeScript), Terraform, CloudFormation</li>
+        </ul>
+      </div>
+      <div class="skill-cat">
+        <h3>DevOps &amp; Infrastructure</h3>
+        <ul>
+          <li>Linux/Unix (RHEL, Ubuntu, Solaris)</li>
+          <li>Jenkins, Ansible, Docker</li>
+          <li>Prometheus, Grafana</li>
+        </ul>
+      </div>
+      <div class="skill-cat">
+        <h3>Other</h3>
+        <ul>
+          <li>Comptel Mediation/EventLink &amp; Billing</li>
+          <li>PyTorch &amp; computer vision</li>
+          <li>Agile/Scrum (Jira)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <h2>// Experience</h2>
+
+    <div class="role-entry">
+      <div class="role-dates mono">2017 — Present</div>
+      <div>
+        <div class="role-title">Senior Infrastructure Engineer</div>
+        <div class="role-org">Cancer Research UK</div>
+        <p class="role-desc">Progressed from Systems Administrator to Senior Infrastructure Engineer. Led AWS WAF, Landing Zone→Control Tower, and SFTP-to-Transfer-Family architecture design and delivery.</p>
+      </div>
+    </div>
+
+    <div class="role-entry">
+      <div class="role-dates mono">2012 — 2016</div>
+      <div>
+        <div class="role-title">Senior Engineer, Telecom Business Operations</div>
+        <div class="role-org">Mobily KSA (via Dar Al Riyadh Group)</div>
+        <p class="role-desc">Designed and led the migration of the Comptel Operations platform from Solaris to RHEL, directing a 3-person team across the IN and GSM CDR functions.</p>
+      </div>
+    </div>
+
+    <div class="role-entry">
+      <div class="role-dates mono">2010 — 2012</div>
+      <div>
+        <div class="role-title">Senior Engineer, Mediation Billing Operations</div>
+        <div class="role-org">Mobily Infotech India Pvt Ltd</div>
+        <p class="role-desc">Progressed from the legacy mediation billing operations team to lead the Comptel Operations team, coordinating NSS-mediation CDR generation and ITIL-based operations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <h2>// Featured Project</h2>
+    <div class="project-card">
+      <h3>Waste Classification CNN</h3>
+      <div class="project-meta">TQUK Level 3 — AI Programming with Python</div>
+      <p style="color:var(--text-dim); font-size:14px;">Binary image classifier (recyclable vs. non-recyclable) comparing a custom CNN against ResNet18 transfer learning, trained on an AWS EC2 GPU instance.</p>
+      <div class="project-stats">
+        <div class="stat"><div class="num">90%</div><div class="label">Custom CNN accuracy</div></div>
+        <div class="stat"><div class="num">94%</div><div class="label">ResNet18 accuracy</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="cta">Let's talk about your infrastructure.</div>
+    <div class="contact-links">
+      <a href="mailto:danishsiddiqui09@gmail.com">danishsiddiqui09@gmail.com</a>
+      <a href="https://linkedin.com/in/danishsiddiqui09">linkedin.com/in/danishsiddiqui09</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

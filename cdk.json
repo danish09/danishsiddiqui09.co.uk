@@ -1,0 +1,17 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/portfolio-site.ts",
+  "watch": {
+    "include": ["**"],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/*.d.ts",
+      "**/*.js",
+      "node_modules",
+      "cdk.out"
+    ]
+  },
+  "context": {
+    "domainName": "danishsiddiqui09.co.uk"
+  }
+}
