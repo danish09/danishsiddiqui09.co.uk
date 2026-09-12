@@ -2,6 +2,7 @@
 import * as cdk from "aws-cdk-lib";
 import { CertificateStack } from "../lib/certificate-stack";
 import { PortfolioSiteStack } from "../lib/portfolio-site-stack";
+import { GitHubOidcStack } from "../lib/github-oidc-stack";
 
 const app = new cdk.App();
 
@@ -14,6 +15,9 @@ if (!domainName || domainName === "yourdomain.com") {
 }
 
 const account = process.env.CDK_DEFAULT_ACCOUNT;
+if (!account) {
+  throw new Error("CDK_DEFAULT_ACCOUNT is not set — is your AWS profile/SSO session active?");
+}
 
 // Certificate must live in us-east-1 — CloudFront only accepts ACM
 // certificates from this region, regardless of where the rest of the
@@ -34,3 +38,23 @@ const siteStack = new PortfolioSiteStack(app, "PortfolioSiteStack", {
 // Explicit for clarity — CDK would infer this anyway from the certificate
 // reference above, but the dependency is worth stating outright.
 siteStack.addStackDependency(certificateStack);
+
+// CI/CD access for GitHub Actions — entirely independent of the site's
+// stacks (no dependency either way). Deployed manually, once, by you —
+// see lib/github-oidc-stack.ts for why this isn't part of the normal
+// site deploy flow.
+// The @ID suffixes are GitHub's numeric owner/repo IDs, not typos — see
+// lib/github-oidc-stack.ts for why the OIDC trust policy needs them.
+// Re-fetch via `gh api users/danish09 --jq .id` / `gh api repos/danish09/danishsiddiqui09.co.uk --jq .id`
+// if this repo is ever renamed or transferred (unlikely, but the trust
+// policy would silently stop matching otherwise).
+new GitHubOidcStack(app, "PortfolioOidcStack", {
+  githubRepoOwner: "danish09",
+  githubRepoOwnerId: "28230826",
+  githubRepoName: "danishsiddiqui09.co.uk",
+  githubRepoId: "1366543253",
+  account,
+  deployRegions: ["us-east-1", "eu-west-2"],
+  diffGithubEnvironment: "aws-diff",
+  env: { account, region: "eu-west-2" },
+});

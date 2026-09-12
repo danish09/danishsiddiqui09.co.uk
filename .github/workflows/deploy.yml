@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Avoid two deploys racing if commits land on main in quick succession
+# (e.g. two PRs merged back-to-back).
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      # Deliberately NOT `--all` — PortfolioOidcStack defines this very
+      # role's own permissions and must only ever be deployed manually via
+      # SSO credentials. Naming the two site stacks explicitly means a
+      # typo or future third stack doesn't silently get deployed here too.
+      - run: npx cdk deploy PortfolioCertificateStack PortfolioSiteStack --require-approval never

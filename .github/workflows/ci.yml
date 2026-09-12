@@ -17,3 +17,33 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+
+  diff:
+    needs: build
+    runs-on: ubuntu-latest
+    # Requires manual approval (danish09) before AWS credentials are minted —
+    # the repo is public, so any PR (including from a fork) would otherwise
+    # reach this job. See GitHub Environment "aws-diff".
+    environment: aws-diff
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DIFF_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      # Read-only: this role can only assume the CDK bootstrap lookup-role
+      # (ReadOnlyAccess) in each region, so cdk diff can never turn into an
+      # accidental deploy even if this step were changed to `cdk deploy`.
+      - run: npx cdk diff --all
