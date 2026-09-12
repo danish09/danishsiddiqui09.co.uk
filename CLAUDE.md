@@ -54,12 +54,24 @@ https://github.com/danish09/danishsiddiqui09.co.uk
 - **`main` is protected via a GitHub Ruleset** (not classic branch
   protection — classic couldn't require a PR without also requiring a
   reviewer, which deadlocks a solo repo): requires a PR before merging,
-  requires the `build` status check (from `.github/workflows/ci.yml`,
-  `npm ci` + `npm run build`) to pass, and applies to admins too — no
+  requires **both** the `build` and `diff` status checks (from
+  `.github/workflows/ci.yml`) to pass, and applies to admins too — no
   bypass for anyone, including the repo owner.
-- The **merge itself is a manual action performed by Danish**, not
-  automated — checks passing only unlocks the merge button, it doesn't
-  trigger auto-merge.
+- **GitHub does not let you approve your own PR** via the standard review
+  mechanism — no setting changes this, it's a platform rule, and it's why
+  classic "required reviewer approval" branch protection is a dead end for
+  a solo repo. The `diff` job is gated behind the `aws-diff` GitHub
+  Environment's required-reviewer approval instead — a *different*
+  mechanism (Actions deployment protection, not PR review) that does
+  allow self-approval. Approving that job is the de facto "I've reviewed
+  this, proceed" gate: `diff` can't even start without it, and merge can't
+  happen until `diff` passes.
+- **Merging a PR is a push to `main`, which triggers `deploy.yml`** —
+  merging is not a low-stakes action here, it's the actual production
+  deploy trigger. Because of this: **Claude must never merge a PR or push
+  to `main` itself, under any circumstances** — that action belongs to
+  Danish alone, always. Pushing a feature branch to open a PR is still
+  fine.
 - AWS access uses **IAM Identity Center (SSO)**, no long-lived access keys
   stored on disk anywhere.
 - **GitHub Actions → AWS via OIDC**, no long-lived keys in GitHub Secrets
