@@ -1,20 +1,24 @@
 import { Construct } from "constructs";
 import { Stack, StackProps, CfnOutput } from "aws-cdk-lib";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 
 import { createSiteBucket } from "../resources/bucket";
 import { lookupHostedZone } from "../resources/hosted-zone";
-import { createCertificate } from "../resources/certificate";
 import { createDistribution } from "../resources/cloudfront";
 import { createDnsRecord } from "../resources/dns-record";
 import { deploySite } from "../resources/deployment";
 
 export interface PortfolioSiteStackProps extends StackProps {
   domainName: string;
+  /** ACM certificate from CertificateStack (us-east-1) — see bin/portfolio-site.ts. */
+  certificate: acm.ICertificate;
 }
 
 /**
- * Composes the site's resources: bucket -> hosted zone -> certificate ->
- * distribution -> DNS record -> deployment.
+ * Composes the site's resources: bucket -> hosted zone -> distribution ->
+ * DNS record -> deployment. The ACM certificate is NOT created here — it
+ * comes from CertificateStack via crossRegionReferences, since this stack
+ * deploys to eu-west-2 while the certificate must live in us-east-1.
  *
  * This stack file intentionally contains no resource definitions itself —
  * each piece lives in its own file under /resources, and this file just
@@ -23,13 +27,12 @@ export interface PortfolioSiteStackProps extends StackProps {
  */
 export class PortfolioSiteStack extends Stack {
   constructor(scope: Construct, id: string, props: PortfolioSiteStackProps) {
-    super(scope, id, props);
+    super(scope, id, { ...props, crossRegionReferences: true });
 
-    const { domainName } = props;
+    const { domainName, certificate } = props;
 
     const bucket = createSiteBucket(this, domainName);
     const hostedZone = lookupHostedZone(this, domainName);
-    const certificate = createCertificate(this, domainName, hostedZone);
     const distribution = createDistribution(this, bucket, certificate, domainName);
     createDnsRecord(this, hostedZone, domainName, distribution);
     deploySite(this, bucket, distribution);
