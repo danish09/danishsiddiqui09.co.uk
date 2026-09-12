@@ -14,7 +14,7 @@ import * as acm from "aws-cdk-lib/aws-certificatemanager";
 export function createDistribution(
   scope: Construct,
   bucket: s3.Bucket,
-  certificate: acm.Certificate,
+  certificate: acm.ICertificate,
   domainName: string
 ): cloudfront.Distribution {
   return new cloudfront.Distribution(scope, "SiteDistribution", {
