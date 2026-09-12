@@ -9,25 +9,28 @@ import * as iam from "aws-cdk-lib/aws-iam";
  * the full set of CDK bootstrap roles needed to actually deploy: the
  * deploy-role, the asset-publishing roles, and the lookup-role (needed
  * for context lookups like the hosted zone during synth).
+ *
+ * `githubSubjectPrefix` must be the exact `repo:OWNER@OWNER_ID/NAME@REPO_ID`
+ * form GitHub actually issues (confirmed by decoding a real token) — GitHub
+ * embeds the numeric owner/repo IDs to survive renames, not just the plain
+ * `repo:OWNER/NAME` form the docs lead you to expect. See github-oidc-stack.ts.
  */
 export function createGitHubActionsDeployRole(
   scope: Construct,
   provider: iam.IOpenIdConnectProvider,
-  githubRepo: string,
+  githubSubjectPrefix: string,
   deployableRoleArns: string[]
 ): iam.Role {
   const role = new iam.Role(scope, "GitHubActionsDeployRole", {
     roleName: "github-actions-deploy",
-    description: `Deploy-capable - assumable only from pushes to main on ${githubRepo}`,
+    description: "Deploy-capable - assumable only from pushes to main",
     maxSessionDuration: Duration.hours(8),
     assumedBy: new iam.FederatedPrincipal(
       provider.openIdConnectProviderArn,
       {
         StringEquals: {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-        },
-        StringLike: {
-          "token.actions.githubusercontent.com:sub": `repo:${githubRepo}:ref:refs/heads/main`,
+          "token.actions.githubusercontent.com:sub": `${githubSubjectPrefix}:ref:refs/heads/main`,
         },
       },
       "sts:AssumeRoleWithWebIdentity"

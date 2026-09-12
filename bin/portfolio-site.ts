@@ -43,9 +43,18 @@ siteStack.addStackDependency(certificateStack);
 // stacks (no dependency either way). Deployed manually, once, by you —
 // see lib/github-oidc-stack.ts for why this isn't part of the normal
 // site deploy flow.
+// The @ID suffixes are GitHub's numeric owner/repo IDs, not typos — see
+// lib/github-oidc-stack.ts for why the OIDC trust policy needs them.
+// Re-fetch via `gh api users/danish09 --jq .id` / `gh api repos/danish09/danishsiddiqui09.co.uk --jq .id`
+// if this repo is ever renamed or transferred (unlikely, but the trust
+// policy would silently stop matching otherwise).
 new GitHubOidcStack(app, "PortfolioOidcStack", {
-  githubRepo: "danish09/danishsiddiqui09.co.uk",
+  githubRepoOwner: "danish09",
+  githubRepoOwnerId: "28230826",
+  githubRepoName: "danishsiddiqui09.co.uk",
+  githubRepoId: "1366543253",
   account,
   deployRegions: ["us-east-1", "eu-west-2"],
+  diffGithubEnvironment: "aws-diff",
   env: { account, region: "eu-west-2" },
 });
