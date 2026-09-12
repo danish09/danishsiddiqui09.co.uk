@@ -6,9 +6,8 @@ every session, so it picks up the context below without you re-explaining.
 
 ## What this project is
 
-Personal portfolio website for Danish Siddiqui (Infrastructure Engineering
-Lead, pitching for Solutions Architect / senior infrastructure roles) —
-deployed to AWS via CDK. Domain: `danishsiddiqui09.co.uk`. Repo (public):
+Personal portfolio website for Danish Siddiqui — deployed to AWS via CDK.
+Domain: `danishsiddiqui09.co.uk`. Repo (public):
 https://github.com/danish09/danishsiddiqui09.co.uk
 
 ## Design decisions already made
