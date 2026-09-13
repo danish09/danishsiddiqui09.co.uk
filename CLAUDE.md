@@ -54,12 +54,28 @@ https://github.com/danish09/danishsiddiqui09.co.uk
 - **`main` is protected via a GitHub Ruleset** (not classic branch
   protection — classic couldn't require a PR without also requiring a
   reviewer, which deadlocks a solo repo): requires a PR before merging,
-  requires the `build` status check (from `.github/workflows/ci.yml`,
-  `npm ci` + `npm run build`) to pass, and applies to admins too — no
+  requires **both** the `build` and `diff` status checks (from
+  `.github/workflows/ci.yml`) to pass, and applies to admins too — no
   bypass for anyone, including the repo owner.
-- The **merge itself is a manual action performed by Danish**, not
-  automated — checks passing only unlocks the merge button, it doesn't
-  trigger auto-merge.
+- **GitHub does not let you approve your own PR** via the standard review
+  mechanism — no setting changes this, it's a platform rule, and it's why
+  classic "required reviewer approval" branch protection is a dead end for
+  a solo repo. We initially gated the `diff` job behind the `aws-diff`
+  GitHub Environment's required-reviewer approval as a workaround (Actions
+  deployment protection, a *different* mechanism from PR review, which
+  does allow self-approval) — but decided that was more friction than
+  wanted: Danish just wants to *see* the diff output before merging, not
+  click an extra approval every time. The required-reviewer rule was
+  removed from the `aws-diff` environment (`protection_rules: []`); `diff`
+  now runs automatically on every PR, same as `build`, and is still a
+  required status check on `main`'s ruleset — reviewing its output before
+  merging is manual/visual, not enforced by a gate.
+- **Merging a PR is a push to `main`, which triggers `deploy.yml`** —
+  merging is not a low-stakes action here, it's the actual production
+  deploy trigger. Because of this: **Claude must never merge a PR or push
+  to `main` itself, under any circumstances** — that action belongs to
+  Danish alone, always. Pushing a feature branch to open a PR is still
+  fine.
 - AWS access uses **IAM Identity Center (SSO)**, no long-lived access keys
   stored on disk anywhere.
 - **GitHub Actions → AWS via OIDC**, no long-lived keys in GitHub Secrets
@@ -68,10 +84,15 @@ https://github.com/danish09/danishsiddiqui09.co.uk
   `sts:AssumeRole` on the CDK bootstrap roles (`cdk-hnb659fds-*`) in both
   deploy regions, not granted AWS service permissions directly:
   - `github-actions-diff` — read-only (can only assume the bootstrap
-    `lookup-role`), trusted only from `pull_request` runs. Gated behind
-    the `aws-diff` GitHub Environment (required reviewer: danish09) since
-    the repo is public and this trust condition matches PRs from forks
-    too.
+    `lookup-role`), trusted only from `pull_request` runs, scoped via the
+    `aws-diff` GitHub Environment (kept for the OIDC trust condition's
+    `environment:aws-diff` sub claim, but its required-reviewer rule was
+    removed — runs automatically, no approval click). Note: since the
+    repo is public, this trust condition matches PRs from forks too;
+    accepted as low-risk since the role is strictly read-only
+    (`ReadOnlyAccess` via the bootstrap lookup-role, nothing deploy
+    capable) — worst case is AWS account info disclosure via `cdk diff`
+    output, not any write access.
   - `github-actions-deploy` — trusted only from pushes to `main`. Can
     assume `deploy-role`/`file-publishing-role`/`image-publishing-role`/
     `lookup-role`.
@@ -89,8 +110,8 @@ https://github.com/danish09/danishsiddiqui09.co.uk
   single AI project entry.
 - Whether to script the "hosted zone already exists" assumption away
   (i.e. add a variant resource file for creating the zone from scratch).
-- The `aws-diff` GitHub Environment has `can_admins_bypass: true` by
-  default (GitHub API behavior, not something we set) — inconsistent with
-  the "no bypass for anyone" stance on the branch Ruleset, though low
-  stakes here since danish09 is both the only admin and the only
-  reviewer. Not yet resolved.
+- (Resolved) The `aws-diff` GitHub Environment used to have a
+  required-reviewer rule with `can_admins_bypass: true` — flagged as
+  inconsistent with the branch Ruleset's "no bypass for anyone" stance.
+  Moot now: the required-reviewer rule was removed entirely, so there's
+  nothing left to bypass.
