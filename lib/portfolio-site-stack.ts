@@ -6,7 +6,7 @@ import { createSiteBucket } from "../resources/bucket";
 import { lookupHostedZone } from "../resources/hosted-zone";
 import { createDistribution } from "../resources/cloudfront";
 import { createDnsRecords } from "../resources/dns-record";
-import { createWwwRedirectFunction } from "../resources/www-redirect-function";
+import { createViewerRequestFunction } from "../resources/viewer-request-function";
 import { deploySite } from "../resources/deployment";
 
 export interface PortfolioSiteStackProps extends StackProps {
@@ -16,8 +16,8 @@ export interface PortfolioSiteStackProps extends StackProps {
 }
 
 /**
- * Composes the site's resources: bucket -> hosted zone -> www redirect ->
- * distribution -> DNS records -> deployment. The ACM certificate is NOT created here — it
+ * Composes the site's resources: bucket -> hosted zone -> viewer-request
+ * function -> distribution -> DNS records -> deployment. The ACM certificate is NOT created here — it
  * comes from CertificateStack via crossRegionReferences, since this stack
  * deploys to eu-west-2 while the certificate must live in us-east-1.
  *
@@ -34,8 +34,8 @@ export class PortfolioSiteStack extends Stack {
 
     const bucket = createSiteBucket(this, domainName);
     const hostedZone = lookupHostedZone(this, domainName);
-    const wwwRedirect = createWwwRedirectFunction(this, domainName);
-    const distribution = createDistribution(this, bucket, certificate, domainName, wwwRedirect);
+    const viewerRequest = createViewerRequestFunction(this, domainName);
+    const distribution = createDistribution(this, bucket, certificate, domainName, viewerRequest);
     createDnsRecords(this, hostedZone, domainName, distribution);
     deploySite(this, bucket, distribution);
 

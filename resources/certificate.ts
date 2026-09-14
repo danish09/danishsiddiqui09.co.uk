@@ -15,7 +15,7 @@ import * as route53 from "aws-cdk-lib/aws-route53";
  *
  * Covers both the bare domain and `www.` — CloudFront rejects any request
  * whose hostname isn't on the certificate, so `www` has to be here even
- * though it only ever redirects (see resources/www-redirect-function.ts).
+ * though it only ever redirects (see resources/viewer-request-function.ts).
  * Note: ACM certificates are immutable, so changing the names here makes
  * CloudFormation issue a new certificate and swap it in (no downtime — the
  * old one is kept until the distribution has moved over).

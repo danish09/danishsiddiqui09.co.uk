@@ -2,16 +2,19 @@ import { Construct } from "constructs";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 
 /**
- * Redirects `www.<domain>` to the bare domain, so the site has exactly one
- * canonical URL (better for search engines, and for anyone sharing links).
+ * Runs at the edge on every viewer request, before the cache is checked
+ * (a CloudFront Function: sub-millisecond, no Lambda cold starts). Two jobs:
  *
- * A CloudFront Function runs at the edge on every viewer request, before
- * the cache is checked. It's the lightweight option (sub-millisecond, no
- * Lambda cold starts) and all it needs to do is inspect the Host header:
- * requests for `www` get a 301 to the same path on the bare domain, and
- * everything else passes through untouched.
+ * 1. Redirect `www.<domain>` to the bare domain, so the site has exactly one
+ *    canonical URL (better for search engines, and for anyone sharing links).
+ *
+ * 2. Map clean URLs to the files in the bucket: `/experience` becomes
+ *    `/experience.html`. S3 has no notion of "index resolution" for a
+ *    private OAC origin — it would look for an object literally named
+ *    `experience` and fail — so the site's nav links only work because of
+ *    this rewrite. `/` is handled by the distribution's defaultRootObject.
  */
-export function createWwwRedirectFunction(
+export function createViewerRequestFunction(
   scope: Construct,
   domainName: string
 ): cloudfront.Function {
@@ -21,6 +24,7 @@ export function createWwwRedirectFunction(
 function handler(event) {
   var request = event.request;
   var host = request.headers.host.value;
+
   if (host === "www.${domainName}") {
     var location = "https://${domainName}" + request.uri;
     if (request.querystring && Object.keys(request.querystring).length > 0) {
@@ -34,13 +38,23 @@ function handler(event) {
       headers: { location: { value: location } },
     };
   }
+
+  // Clean URL → file. Only for paths with no extension in the last
+  // segment, so /style.css, /cv.pdf etc. pass through untouched.
+  var uri = request.uri;
+  if (uri.length > 1 && uri.charAt(uri.length - 1) === "/") {
+    uri = uri.slice(0, -1);
+  }
+  if (uri !== "/" && uri.split("/").pop().indexOf(".") === -1) {
+    request.uri = uri + ".html";
+  }
   return request;
 }
 `;
 
-  return new cloudfront.Function(scope, "WwwRedirectFunction", {
+  return new cloudfront.Function(scope, "ViewerRequestFunction", {
     code: cloudfront.FunctionCode.fromInline(code),
     runtime: cloudfront.FunctionRuntime.JS_2_0,
-    comment: `Redirect www.${domainName} to ${domainName}`,
+    comment: `www redirect + clean-URL rewrite for ${domainName}`,
   });
 }
