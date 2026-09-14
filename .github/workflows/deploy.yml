@@ -30,6 +30,11 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: eu-west-2
+          # The action defaults to a 1-hour session even though the role
+          # allows 8 (resources/github-actions-deploy-role.ts). A certificate
+          # replacement on 14 Sep 2026 outlived the hour and the job died
+          # with ExpiredToken while CloudFormation carried on without it.
+          role-duration-seconds: 28800
 
       # Deliberately NOT `--all` — PortfolioOidcStack defines this very
       # role's own permissions and must only ever be deployed manually via

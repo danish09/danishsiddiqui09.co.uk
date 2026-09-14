@@ -9,3 +9,6 @@ cdk.out
 
 # CDK context cache — holds looked-up hosted zone IDs (account-specific)
 cdk.context.json
+
+# Personal documents (CV etc.) — repo is public, never commit these
+docs/

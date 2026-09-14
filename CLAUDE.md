@@ -45,11 +45,26 @@ https://github.com/danish09/danishsiddiqui09.co.uk
   the price of one cross-region reference.
 - **Assumes a Route 53 hosted zone already exists** for the domain.
 - **`www.` redirects to the bare domain** (301, via a CloudFront Function on
-  viewer-request — `resources/www-redirect-function.ts`). The certificate
+  viewer-request — `resources/viewer-request-function.ts`). The certificate
   carries `www` as a SAN, the distribution lists it as an alias, and Route 53
   has an A record for it — all three are needed for CloudFront to even
   answer, before the redirect gets a chance to run. Bare domain is the one
   canonical URL; don't add `www` links anywhere.
+- **The site is multi-page with clean URLs** (`/experience`, `/skills`,
+  `/credentials`, `/projects`; `/` is the hero + summary). The same
+  viewer-request function rewrites extensionless paths to `<path>.html`,
+  because a private S3/OAC origin has no index resolution. Locally
+  `npx serve site` does the same mapping, so links behave identically. Pages
+  share `site/style.css`; nav and footer are duplicated per page (no build
+  step, by design — Danish wants to move to JS-driven pages later).
+- **Changing the ACM certificate's names replaces the certificate**, and
+  CDK 2.269's cross-region export writer does NOT propagate a changed export
+  value (its diff is key-only) — so after the cert stack completes, the SSM
+  parameter `/cdk/exports/PortfolioSiteStack/...SiteCertificate...` in
+  eu-west-2 must be updated by hand to the new ARN before the site stack
+  will deploy. Also: the cert stack's cleanup can't delete the old cert while
+  the distribution still uses it — swap the distribution's cert manually in
+  the console to unblock. Both bitten on 14 Sep 2026 (PR #5).
 - A bucket was previously created manually with the same name as the
   domain — decision was to delete it and let CDK own the bucket
   entirely, rather than importing it. If you see bucket-name conflicts,

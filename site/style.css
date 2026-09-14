@@ -1,0 +1,100 @@
+:root{
+    --bg: #0F1B2D;
+    --bg-panel: #14243A;
+    --line: #25384F;
+    --text: #EDEFF2;
+    --text-dim: #9FB0C3;
+    --accent: #5FA8E0;
+    --accent-warm: #C98A3E;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  p{ text-align:justify; }
+  a{ color:var(--accent); text-decoration:none; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 28px; }
+
+  /* NAV */
+  nav{ position:sticky; top:0; background:rgba(15,27,45,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); z-index:10; }
+  nav .wrap{ display:flex; justify-content:space-between; align-items:center; height:60px; }
+  nav .name{ font-weight:600; font-size:15px; color:var(--text); }
+  nav .links{ display:flex; gap:24px; font-size:13px; }
+  nav .links a{ color:var(--text-dim); }
+  nav .links a:hover, nav .links a.active{ color:var(--text); }
+  main.page > section:first-child{ padding-top:80px; }
+
+  /* HERO */
+  header.hero{ padding:100px 0 70px; border-bottom:1px solid var(--line); position:relative; overflow:hidden; }
+  .eyebrow{ color:var(--accent); font-size:13px; letter-spacing:0.02em; margin-bottom:18px; }
+  h1{ font-size:clamp(34px,5vw,54px); font-weight:600; line-height:1.12; max-width:11ch; }
+  .role{ color:var(--text-dim); font-size:19px; margin-top:16px; max-width:52ch; }
+  .hero-meta{ display:flex; gap:28px; margin-top:36px; font-size:13px; color:var(--text-dim); flex-wrap:wrap; }
+  .hero-meta span{ display:flex; align-items:center; gap:8px; }
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block; }
+
+  /* NETWORK DIAGRAM */
+  /* Wider than the text column on big screens (breaks out of .wrap, centred),
+     capped to the viewport otherwise; scrolls sideways on phones rather than
+     shrinking the labels into illegibility. */
+  .diagram{ margin-top:56px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+            width:min(1200px, 100vw - 80px); margin-left:calc((100% - min(1200px, 100vw - 80px)) / 2); }
+  .diagram svg{ width:100%; min-width:960px; height:auto; display:block; }
+  .node-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--text-dim); }
+  .node-label.active{ fill:var(--text); }
+
+  /* SECTIONS */
+  section{ padding:60px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  h2{ font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); font-family:'IBM Plex Mono',monospace; font-weight:500; margin-bottom:28px; }
+  .summary-text{ font-size:17px; max-width:68ch; color:#DCE2EA; }
+
+  /* SKILLS */
+  .skills-grid{ display:grid; grid-template-columns:1fr 1fr; gap:36px; }
+  .skill-cat h3{ font-size:14px; font-weight:600; margin-bottom:10px; }
+  .skill-cat ul{ list-style:none; }
+  .skill-cat li{ font-size:13.5px; color:var(--text-dim); padding:5px 0 5px 16px; position:relative; border-left:1px solid var(--line); margin-left:2px; }
+  .skill-cat li::before{ content:""; position:absolute; left:-3px; top:13px; width:5px; height:1px; background:var(--line); }
+
+  /* EXPERIENCE TIMELINE */
+  .role-entry{ display:grid; grid-template-columns:130px 1fr; gap:20px; padding:26px 0; border-top:1px solid var(--line); }
+  .role-entry:first-child{ border-top:none; }
+  .role-dates{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-dim); padding-top:3px; }
+  .role-title{ font-size:16px; font-weight:600; }
+  .role-org{ color:var(--accent); font-size:14px; margin-top:2px; }
+  .role-desc{ color:var(--text-dim); font-size:14px; margin-top:10px; max-width:60ch; }
+  .role-highlights{ list-style:none; margin-top:12px; max-width:60ch; }
+  .role-highlights li{ color:var(--text-dim); font-size:13.5px; padding:4px 0 4px 16px; position:relative; border-left:1px solid var(--line); margin-left:2px; text-align:justify; }
+  .role-highlights li::before{ content:""; position:absolute; left:-3px; top:13px; width:5px; height:1px; background:var(--line); }
+
+  /* CERTIFICATIONS */
+  .cert-list{ list-style:none; }
+  .cert-list li{ font-size:14px; padding:8px 0 8px 16px; position:relative; border-left:1px solid var(--line); margin-left:2px; }
+  .cert-list li::before{ content:""; position:absolute; left:-3px; top:17px; width:5px; height:1px; background:var(--accent); }
+
+  /* PROJECT */
+  .project-card{ background:var(--bg-panel); border:1px solid var(--line); border-radius:6px; padding:26px; }
+  .project-card h3{ font-size:16px; margin-bottom:8px; }
+  .project-meta{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent-warm); margin-bottom:14px; }
+  .project-stats{ display:flex; gap:32px; margin-top:18px; }
+  .stat{ font-family:'IBM Plex Mono',monospace; }
+  .stat .num{ font-size:24px; color:var(--accent); font-weight:500; }
+  .stat .label{ font-size:11px; color:var(--text-dim); margin-top:2px; }
+
+  /* CONTACT */
+  footer{ padding:60px 0 80px; text-align:left; }
+  footer .cta{ font-size:22px; font-weight:600; max-width:20ch; }
+  footer .contact-links{ margin-top:24px; display:flex; flex-wrap:wrap; gap:12px 24px; font-family:'IBM Plex Mono',monospace; font-size:13px; }
+
+  @media (max-width:640px){
+    .skills-grid{ grid-template-columns:1fr; }
+    .role-entry{ grid-template-columns:1fr; gap:6px; }
+    /* Multi-page site: the links are the only way between pages, so they
+       must stay visible on phones — wrap onto a second line instead. */
+    nav .wrap{ height:auto; flex-wrap:wrap; padding-top:12px; padding-bottom:12px; gap:8px 16px; }
+    nav .links{ flex-wrap:wrap; gap:8px 16px; font-size:12px; }
+  }

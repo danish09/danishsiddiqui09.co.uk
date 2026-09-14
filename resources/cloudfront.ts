@@ -12,15 +12,16 @@ import * as acm from "aws-cdk-lib/aws-certificatemanager";
  * bucket needing a public-read policy.
  *
  * Answers for both the bare domain and `www.` (CloudFront returns 403 for
- * any Host it isn't explicitly told about), with `wwwRedirect` turning the
- * latter into a 301 to the former before anything is served.
+ * any Host it isn't explicitly told about); `viewerRequest` turns the
+ * latter into a 301 to the former, and maps clean URLs like /experience to
+ * their .html objects, before anything is served.
  */
 export function createDistribution(
   scope: Construct,
   bucket: s3.Bucket,
   certificate: acm.ICertificate,
   domainName: string,
-  wwwRedirect: cloudfront.Function
+  viewerRequest: cloudfront.Function
 ): cloudfront.Distribution {
   return new cloudfront.Distribution(scope, "SiteDistribution", {
     defaultRootObject: "index.html",
@@ -32,7 +33,7 @@ export function createDistribution(
       cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
       functionAssociations: [
         {
-          function: wwwRedirect,
+          function: viewerRequest,
           eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
         },
       ],
