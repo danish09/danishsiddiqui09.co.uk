@@ -44,6 +44,12 @@ https://github.com/danish09/danishsiddiqui09.co.uk
   regions avoids paying an unnecessary regional cost for no benefit, at
   the price of one cross-region reference.
 - **Assumes a Route 53 hosted zone already exists** for the domain.
+- **`www.` redirects to the bare domain** (301, via a CloudFront Function on
+  viewer-request — `resources/www-redirect-function.ts`). The certificate
+  carries `www` as a SAN, the distribution lists it as an alias, and Route 53
+  has an A record for it — all three are needed for CloudFront to even
+  answer, before the redirect gets a chance to run. Bare domain is the one
+  canonical URL; don't add `www` links anywhere.
 - A bucket was previously created manually with the same name as the
   domain — decision was to delete it and let CDK own the bucket
   entirely, rather than importing it. If you see bucket-name conflicts,

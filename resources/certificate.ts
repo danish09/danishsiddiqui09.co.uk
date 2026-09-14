@@ -12,6 +12,13 @@ import * as route53 from "aws-cdk-lib/aws-route53";
  *
  * Validation is automatic: CDK creates the DNS validation records in the
  * hosted zone for you, since we pass it the zone.
+ *
+ * Covers both the bare domain and `www.` — CloudFront rejects any request
+ * whose hostname isn't on the certificate, so `www` has to be here even
+ * though it only ever redirects (see resources/www-redirect-function.ts).
+ * Note: ACM certificates are immutable, so changing the names here makes
+ * CloudFormation issue a new certificate and swap it in (no downtime — the
+ * old one is kept until the distribution has moved over).
  */
 export function createCertificate(
   scope: Construct,
@@ -20,6 +27,7 @@ export function createCertificate(
 ): acm.Certificate {
   return new acm.Certificate(scope, "SiteCertificate", {
     domainName,
+    subjectAlternativeNames: [`www.${domainName}`],
     validation: acm.CertificateValidation.fromDns(hostedZone),
   });
 }
