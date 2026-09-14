@@ -5,7 +5,8 @@ import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import { createSiteBucket } from "../resources/bucket";
 import { lookupHostedZone } from "../resources/hosted-zone";
 import { createDistribution } from "../resources/cloudfront";
-import { createDnsRecord } from "../resources/dns-record";
+import { createDnsRecords } from "../resources/dns-record";
+import { createWwwRedirectFunction } from "../resources/www-redirect-function";
 import { deploySite } from "../resources/deployment";
 
 export interface PortfolioSiteStackProps extends StackProps {
@@ -15,8 +16,8 @@ export interface PortfolioSiteStackProps extends StackProps {
 }
 
 /**
- * Composes the site's resources: bucket -> hosted zone -> distribution ->
- * DNS record -> deployment. The ACM certificate is NOT created here — it
+ * Composes the site's resources: bucket -> hosted zone -> www redirect ->
+ * distribution -> DNS records -> deployment. The ACM certificate is NOT created here — it
  * comes from CertificateStack via crossRegionReferences, since this stack
  * deploys to eu-west-2 while the certificate must live in us-east-1.
  *
@@ -33,8 +34,9 @@ export class PortfolioSiteStack extends Stack {
 
     const bucket = createSiteBucket(this, domainName);
     const hostedZone = lookupHostedZone(this, domainName);
-    const distribution = createDistribution(this, bucket, certificate, domainName);
-    createDnsRecord(this, hostedZone, domainName, distribution);
+    const wwwRedirect = createWwwRedirectFunction(this, domainName);
+    const distribution = createDistribution(this, bucket, certificate, domainName, wwwRedirect);
+    createDnsRecords(this, hostedZone, domainName, distribution);
     deploySite(this, bucket, distribution);
 
     new CfnOutput(this, "SiteUrl", {
